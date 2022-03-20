@@ -75,8 +75,8 @@
           <th>Dropdown</th>
           <th>Date</th>
           <th>Time</th>
-          <th>Text 1</th>
-          <th>Text 2</th>
+          <th>Text</th>
+          <th>Counter</th>
         </tr>
       </thead>
       <tbody>
@@ -89,8 +89,14 @@
         <td><input type="date" readonly></td>
         <td><input type="time" readonly></td>
         <td><input readonly></td>
-        <td><input readonly></td>
+        <td><al-counter readonly></td>
       </tr>
+    </template>
+
+    <template id="al-counter">
+      <span></span>
+      <button data-increment>+</button>
+      <button data-decrement>-</button>
     </template>
 
     <datalist id="list">
@@ -103,6 +109,51 @@
   </main>
 
   <script>
+    customElements.define('al-counter', class extends HTMLElement {
+      constructor() {
+        super();
+        this.attachShadow({ mode: 'open' }).appendChild(document.getElementById('al-counter').content.cloneNode(true));
+
+        this.span = this.shadowRoot.querySelector('span');
+        this.increment = this.shadowRoot.querySelector('[data-increment]');
+        this.decrement = this.shadowRoot.querySelector('[data-decrement]');
+
+        this.value = this.getAttribute('value') ?? 1;
+        this.readOnly = this.hasAttribute('readonly');
+
+        this.increment.addEventListener('click', _ => this.value++);
+        this.decrement.addEventListener('click', _ => this.value--);
+      }
+
+      get value() {
+        return parseInt(this.getAttribute('value'));
+      }
+
+      set value(v) {
+        this.setAttribute('value', v);
+        this.span.textContent = v;
+      }
+
+      get readOnly() {
+        return this.hasAttribute('readonly');
+      }
+
+      set readOnly(r) {
+        if (r) {
+          this.setAttribute('readonly', '');
+           // MUST use opacity. Setting visibility: hidden or display: none will prevent the
+           // buttons from being focusable (i.e. pressing <tab> to navigate will not work).
+          this.increment.style.opacity = 0;
+          this.decrement.style.opacity = 0;
+        }
+        else {
+          this.removeAttribute('readonly');
+          this.increment.style.opacity = 1;
+          this.decrement.style.opacity = 1;
+        }
+      }
+    });
+
     function setCellsReadOnly(event, status) {
       for (const cell of event.target.closest('tr').cells) {
         if (cell.firstElementChild?.readOnly !== undefined) {
@@ -126,6 +177,7 @@
 
     document.querySelector('tbody').appendChild(fragment);
     rowTemplate.remove();
+    document.getElementById('al-counter').remove();
   </script>
 </body>
 
