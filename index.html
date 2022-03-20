@@ -83,7 +83,7 @@
       </tbody>
     </table>
 
-    <template>
+    <template id="row-template">
       <tr>
         <td><input list="list" readonly></td>
         <td><input type="date" readonly></td>
@@ -117,15 +117,15 @@
     table.addEventListener('mouseout', e => setCellsReadOnly(e, true));
     table.addEventListener('focusout', e => setCellsReadOnly(e, true));
 
-    const template = document.querySelector('template');
-    const fragment = template.content;
-    const rowTemplate = fragment.firstElementChild;
+    const rowTemplate = document.getElementById('row-template');
+    const fragment = rowTemplate.content;
+    const row = fragment.firstElementChild;
     for (let i = 0; i < 99; i++) { // 99 + original rowTemplate = 100 total rows
-      fragment.appendChild(rowTemplate.cloneNode(true));
+      fragment.appendChild(row.cloneNode(true));
     }
 
     document.querySelector('tbody').appendChild(fragment);
-    template.remove();
+    rowTemplate.remove();
   </script>
 </body>
 
